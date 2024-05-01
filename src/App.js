@@ -108,7 +108,7 @@ useEffect(() => {
 
   
 
-  const calculateUserPerformance = () => {
+  const calculateUserPerformance = useCallback(() => {
     // Initialize counts for different statuses
     const statusCounts = { Started: 0, Completed: 0, 'In Progress': 0 }
 
@@ -124,20 +124,20 @@ useEffect(() => {
         default:
           statusCounts['In Progress']++;
       }
-    });
+    })
 
     return [
       { name: 'Started', value: statusCounts.Started },
       { name: 'Completed', value: statusCounts.Completed },
       {name: 'In Progress', value: statusCounts['In Progress'] }
     ];
-  };
+  },[tasks]);
 
   const [userPerformance, setUserPerformance] = useState(calculateUserPerformance());
  
   const updatePerformance = useCallback(() => {
     setUserPerformance(calculateUserPerformance());
-  }, [tasks,calculateUserPerformance]);
+  }, [calculateUserPerformance]);
   useEffect(() => {
     // Update user performance when tasks change
     updatePerformance();
@@ -202,4 +202,3 @@ const App = () => {
 };
 
 export default App;
-
