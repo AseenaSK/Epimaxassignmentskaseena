@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useCallback } from 'react';
 import { Tooltip, PieChart, Pie, Cell } from 'recharts';
 import "./App.css"
 
@@ -91,24 +91,22 @@ const TaskList = () => {
     setTasks(updatedTasks);
   };
 
-  useEffect(() => {
-    // Update assignees when tasks or selectedStatus change
-    updateAssignees();
-  }, [tasks, selectedStatus]);
-
-  const updateAssignees = () => {
+  const updateAssignees = useCallback(() => {
     let filteredTasks = tasks;
     if (selectedStatus !== 'All') {
-      filteredTasks = tasks.filter(task => task.status === selectedStatus);
+        filteredTasks = tasks.filter(task => task.status === selectedStatus);
     }
     const newAssignees = filteredTasks.map(task => task.assignee);
     setAssignees([...new Set(newAssignees)]);
-  };
+}, [tasks, selectedStatus]);
 
-  useEffect(() => {
-    // Update user performance when tasks change
-    updatePerformance();
-  }, [tasks]);
+useEffect(() => {
+    // Update assignees when tasks or selectedStatus change
+    updateAssignees();
+}, [updateAssignees]);
+
+
+  
 
   const calculateUserPerformance = () => {
     // Initialize counts for different statuses
@@ -136,11 +134,14 @@ const TaskList = () => {
   };
 
   const [userPerformance, setUserPerformance] = useState(calculateUserPerformance());
-
-  const updatePerformance = () => {
+ 
+  const updatePerformance = useCallback(() => {
     setUserPerformance(calculateUserPerformance());
-  };
-
+  }, [tasks,calculateUserPerformance]);
+  useEffect(() => {
+    // Update user performance when tasks change
+    updatePerformance();
+  }, [tasks,updatePerformance]);
   return (
     <div>
       <TaskForm addTask={addTask} />
@@ -201,3 +202,4 @@ const App = () => {
 };
 
 export default App;
+
